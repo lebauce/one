@@ -113,6 +113,22 @@ void LifeCycleManager::trigger(Actions action, int _vid)
         aname = "MONITOR_DONE";
         break;
 
+    case SCALE_MEMORY_SUCCESS:
+        aname = "SCALE_MEMORY_SUCCESS";
+        break;
+
+    case SCALE_MEMORY_FAILURE:
+        aname = "SCALE_MEMORY_FAILURE";
+        break;
+
+    case SCALE_VCPU_SUCCESS:
+        aname = "SCALE_VCPU_SUCCESS";
+        break;
+
+    case SCALE_VCPU_FAILURE:
+        aname = "SCALE_VCPU_FAILURE";
+        break;
+
     case PROLOG_SUCCESS:
         aname = "PROLOG_SUCCESS";
         break;
@@ -189,6 +205,14 @@ void LifeCycleManager::trigger(Actions action, int _vid)
         aname = "CLEAN";
         break;
 
+    case SCALE_MEMORY:
+        aname = "SCALE_MEMORY";
+        break;
+
+    case SCALE_VCPU:
+        aname = "SCALE_VCPU";
+        break;
+
     case FINALIZE:
         aname = ACTION_FINALIZE;
         break;
@@ -261,6 +285,22 @@ void LifeCycleManager::do_action(const string &action, void * arg)
     else if (action == "MONITOR_DONE")
     {
         monitor_done_action(vid);
+    }
+    else if (action == "SCALE_MEMORY_SUCCESS")
+    {
+        scale_memory_success_action(vid);
+    }
+    else if (action == "SCALE_MEMORY_FAILURE")
+    {
+        scale_memory_failure_action(vid);
+    }
+    else if (action == "SCALE_VCPU_SUCCESS")
+    {
+        scale_vcpu_success_action(vid);
+    }
+    else if (action == "SCALE_VCPU_FAILURE")
+    {
+        scale_vcpu_failure_action(vid);
     }
     else if (action == "PROLOG_SUCCESS")
     {
@@ -337,6 +377,14 @@ void LifeCycleManager::do_action(const string &action, void * arg)
     else if (action == "CLEAN")
     {
         clean_action(vid);
+    }
+    else if (action == "SCALE_MEMORY")
+    {
+        scale_memory_action(vid);
+    }
+    else if (action == "SCALE_VCPU")
+    {
+        scale_vcpu_action(vid);
     }
     else if (action == ACTION_FINALIZE)
     {

@@ -472,6 +472,38 @@ valid options: list, delay, xml, numeric, kilobytes
 .IP "" 0
 
 .
+.IP "\(bu" 4
+memset \fIrange|vmid_list\fR \fImemory\fR
+.
+.IP "" 4
+.
+.nf
+
+Change the amount of memory of the given VM online
+
+States: RUNNING
+.
+.fi
+.
+.IP "" 0
+
+.
+.IP "\(bu" 4
+vcpuset \fIrange|vmid_list\fR \fIvcpu\fR
+.
+.IP "" 4
+.
+.nf
+
+Change the number of VCPUs of the given VM online
+
+States: RUNNING
+.
+.fi
+.
+.IP "" 0
+
+.
 .IP "" 0
 .
 .SH "ARGUMENT FORMATS"
@@ -615,6 +647,34 @@ diskid
 .nf
 
 Integer
+.
+.fi
+.
+.IP "" 0
+
+.
+.IP "\(bu" 4
+memory
+.
+.IP "" 4
+.
+.nf
+
+OpenNebula VM amount of memory
+.
+.fi
+.
+.IP "" 0
+
+.
+.IP "\(bu" 4
+vcpu
+.
+.IP "" 4
+.
+.nf
+
+OpenNebula VM number of VPUs
 .
 .fi
 .

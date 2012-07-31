@@ -54,6 +54,7 @@ VirtualMachine::VirtualMachine(int           id,
         deploy_id(""),
         memory(0),
         cpu(0),
+        vcpu(0),
         net_tx(0),
         net_rx(0),
         history(0),
@@ -1863,6 +1864,7 @@ string& VirtualMachine::to_xml_extended(string& xml, int n_history) const
         << "<DEPLOY_ID>" << deploy_id << "</DEPLOY_ID>"
         << "<MEMORY>"    << memory    << "</MEMORY>"
         << "<CPU>"       << cpu       << "</CPU>"
+        << "<VCPU>"      << vcpu      << "</VCPU>"
         << "<NET_TX>"    << net_tx    << "</NET_TX>"
         << "<NET_RX>"    << net_rx    << "</NET_RX>"
         << obj_template->to_xml(template_xml);
@@ -1932,6 +1934,7 @@ int VirtualMachine::from_xml(const string &xml_str)
 
     rc += xpath(memory,    "/VM/MEMORY",   0);
     rc += xpath(cpu,       "/VM/CPU",      0);
+    rc += xpath(vcpu,      "/VM/VCPU",     0);
     rc += xpath(net_tx,    "/VM/NET_TX",   0);
     rc += xpath(net_rx,    "/VM/NET_RX",   0);
 

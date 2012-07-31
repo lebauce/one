@@ -150,6 +150,14 @@ void VirtualMachineManager::trigger(Actions action, int _vid)
         aname = "MIGRATE";
         break;
 
+    case SCALE_MEMORY:
+        aname = "SCALE_MEMORY";
+        break;
+
+    case SCALE_VCPU:
+        aname = "SCALE_VCPU";
+        break;
+
     case POLL:
         aname = "POLL";
         break;
@@ -238,6 +246,14 @@ void VirtualMachineManager::do_action(const string &action, void * arg)
     {
         migrate_action(vid);
     }
+    else if (action == "SCALE_MEMORY")
+    {
+        scale_memory_action(vid);
+    }
+    else if (action == "SCALE_VCPU")
+    {
+        scale_vcpu_action(vid);
+    }
     else if (action == "POLL")
     {
         poll_action(vid);
@@ -283,6 +299,8 @@ string * VirtualMachineManager::format_message(
     const string& m_hostname,
     const string& m_net_drv,
     const string& domain,
+    const string& memory,
+    const string& vcpu,
     const string& ldfile,
     const string& rdfile,
     const string& cfile,
@@ -313,6 +331,24 @@ string * VirtualMachineManager::format_message(
     else
     {
         oss << "<DEPLOY_ID/>";
+    }
+
+    if (!memory.empty())
+    {
+        oss << "<MEMORY>" << memory << "</MEMORY>";
+    }
+    else
+    {
+        oss << "<MEMORY/>";
+    }
+
+    if (!vcpu.empty())
+    {
+        oss << "<VCPU>" << vcpu << "</VCPU>";
+    }
+    else
+    {
+        oss << "<VCPU/>";
     }
 
     if (!ldfile.empty())
@@ -403,6 +439,8 @@ void VirtualMachineManager::deploy_action(int vid)
     drv_msg = format_message(
         vm->get_hostname(),
         vm->get_vnm_mad(),
+        "",
+        "",
         "",
         "",
         "",
@@ -507,6 +545,8 @@ void VirtualMachineManager::save_action(
         vm->get_deploy_id(),
         "",
         "",
+        "",
+        "",
         vm->get_checkpoint_file(),
         "",
         "",
@@ -591,6 +631,8 @@ void VirtualMachineManager::shutdown_action(
         "",
         "",
         "",
+        "",
+        "",
         vm->to_xml(vm_tmpl));
 
     vmd->shutdown(vid, *drv_msg);
@@ -667,6 +709,8 @@ void VirtualMachineManager::reboot_action(
         "",
         "",
         "",
+        "",
+        "",
         vm->to_xml(vm_tmpl));
 
     vmd->reboot(vid, *drv_msg);
@@ -733,6 +777,8 @@ void VirtualMachineManager::reset_action(
         "",
         "",
         vm->get_deploy_id(),
+        "",
+        "",
         "",
         "",
         "",
@@ -805,6 +851,8 @@ void VirtualMachineManager::cancel_action(
         "",
         "",
         vm->get_deploy_id(),
+        "",
+        "",
         "",
         "",
         "",
@@ -890,6 +938,8 @@ void VirtualMachineManager::cancel_previous_action(
         "",
         "",
         "",
+        "",
+        "",
         vm->to_xml(vm_tmpl));
 
     vmd->cancel(vid, *drv_msg);
@@ -961,6 +1011,8 @@ void VirtualMachineManager::migrate_action(
         vm->get_hostname(),
         vm->get_vnm_mad(),
         vm->get_deploy_id(),
+        "",
+        "",
         "",
         "",
         "",
@@ -1045,7 +1097,9 @@ void VirtualMachineManager::restore_action(
         vm->get_deploy_id(),
         "",
         "",
-        vm->get_checkpoint_file(),
+        "",
+        "",
+        "",
         "",
         "",
         vm->to_xml(vm_tmpl));
@@ -1073,6 +1127,157 @@ error_common:
 
     lcm->trigger(LifeCycleManager::DEPLOY_FAILURE, vid);
 
+    vm->log("VMM", Log::ERROR, os);
+    vm->unlock();
+    return;
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void VirtualMachineManager::scale_memory_action(
+    int vid)
+{
+    VirtualMachine *                    vm;
+    const VirtualMachineManagerDriver * vmd;
+
+    string        vm_tmpl;
+    string *      drv_msg;
+    ostringstream os;
+    string        memory;
+
+    // Get the VM from the pool
+    vm = vmpool->get(vid,true);
+
+    if (vm == 0)
+    {
+        return;
+    }
+
+    // FIXME Should I care?
+    if (!vm->hasHistory())
+    {
+        goto error_history;
+    }
+
+    // Get the driver for this VM
+    vmd = get(vm->get_vmm_mad());
+
+    if ( vmd == 0 )
+    {
+        goto error_driver;
+    }
+
+    memory = vm->get_memory();
+
+    // Invoke driver method
+    drv_msg = format_message(
+        vm->get_hostname(),
+        vm->get_vnm_mad(),
+        "",
+        "",
+        vm->get_deploy_id(),
+        memory,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        vm->to_xml(vm_tmpl));
+
+    vmd->scale_memory(vid, *drv_msg);
+
+    delete drv_msg;
+
+    vm->unlock();
+
+    return;
+
+error_history:
+    os.str("");
+    os << "scale_memory_action, VM has no history";
+    goto error_common;
+
+error_driver:
+    os.str("");
+    os << "scale_memory_action, error getting driver " << vm->get_vmm_mad();
+
+error_common:
+    vm->log("VMM", Log::ERROR, os);
+    vm->unlock();
+    return;
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void VirtualMachineManager::scale_vcpu_action(
+    int vid)
+{
+    VirtualMachine *                    vm;
+    const VirtualMachineManagerDriver * vmd;
+
+    string        vm_tmpl;
+    string *      drv_msg;
+    ostringstream os;
+
+    // Get the VM from the pool
+    vm = vmpool->get(vid,true);
+
+    if (vm == 0)
+    {
+        return;
+    }
+
+    // FIXME Should I care?
+    if (!vm->hasHistory())
+    {
+        goto error_history;
+    }
+
+    // Get the driver for this VM
+    vmd = get(vm->get_vmm_mad());
+
+    if ( vmd == 0 )
+    {
+        goto error_driver;
+    }
+
+    // Invoke driver method
+    drv_msg = format_message(
+        vm->get_hostname(),
+        vm->get_vnm_mad(),
+        "",
+        "",
+        vm->get_deploy_id(),
+        "",
+        vm->get_vcpu(),
+        "",
+        "",
+        "",
+        "",
+        "",
+        vm->to_xml(vm_tmpl));
+
+    vmd->scale_vcpu(vid, *drv_msg);
+
+    delete drv_msg;
+
+    vm->unlock();
+
+    return;
+
+error_history:
+    os.str("");
+    os << "scale_vcpu_action, VM has no history";
+    goto error_common;
+
+error_driver:
+    os.str("");
+    os << "scale_vcpu_action, error getting driver " << vm->get_vmm_mad();
+
+error_common:
     vm->log("VMM", Log::ERROR, os);
     vm->unlock();
     return;
@@ -1120,6 +1325,8 @@ void VirtualMachineManager::poll_action(
         "",
         "",
         vm->get_deploy_id(),
+        "",
+        "",
         "",
         "",
         "",
@@ -1287,6 +1494,8 @@ void VirtualMachineManager::timer_action()
             "",
             "",
             "",
+            "",
+            "",
             vm->to_xml(vm_tmpl));
 
         vmd->poll(*it, *drv_msg);
@@ -1385,6 +1594,8 @@ void VirtualMachineManager::attach_action(
         "",
         "",
         vm->get_deploy_id(),
+        "",
+        "",
         "",
         "",
         "",
@@ -1505,6 +1716,8 @@ void VirtualMachineManager::detach_action(
         "",
         "",
         vm->get_deploy_id(),
+        "",
+        "",
         "",
         "",
         "",

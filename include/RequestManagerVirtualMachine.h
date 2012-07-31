@@ -208,4 +208,40 @@ public:
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
+class VirtualMachineMemSet : public RequestManagerVirtualMachine
+{
+public:
+    VirtualMachineMemSet():
+        RequestManagerVirtualMachine("VirtualMachineMemSet",
+                           "Change the amount of memory of the given VM online",
+                           "A:siiss"){}; // FIXME What is that third argument?
+
+    ~VirtualMachineMemSet(){};
+
+    void request_execute(xmlrpc_c::paramList const& _paramList,
+            RequestAttributes& att);
+};
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+class VirtualMachineVcpuSet : public RequestManagerVirtualMachine
+{
+public:
+    VirtualMachineVcpuSet():
+        RequestManagerVirtualMachine("VirtualMachineVcpuSet",
+                           "Change the number of VCPUs of the given VM online",
+                           "A:siiss"){}; // FIXME What is that third argument?
+
+    ~VirtualMachineVcpuSet(){};
+
+    void request_execute(xmlrpc_c::paramList const& _paramList,
+            RequestAttributes& att);
+};
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
 #endif

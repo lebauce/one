@@ -98,6 +98,34 @@ void VirtualMachineManagerDriver::get_default(
     }
 }
 
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void VirtualMachineManagerDriver::scale_memory (
+    const int     oid,
+    const string& drv_msg) const
+{
+    ostringstream os;
+
+    os << "SCALE_MEMORY " << oid << " " << drv_msg << endl;
+
+    write(os);
+};
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void VirtualMachineManagerDriver::scale_vcpu (
+    const int     oid,
+    const string& drv_msg) const
+{
+    ostringstream os;
+
+    os << "SCALE_VCPU " << oid << " " << drv_msg << endl;
+
+    write(os);
+};
+
 /* ************************************************************************** */
 /* MAD Interface                                                              */
 /* ************************************************************************** */
@@ -106,8 +134,8 @@ void VirtualMachineManagerDriver::get_default(
 /* Helpers for the protocol function                                          */
 /* -------------------------------------------------------------------------- */
 
-static void log_error(VirtualMachine* vm, 
-                      ostringstream&  os, 
+static void log_error(VirtualMachine* vm,
+                      ostringstream&  os,
                       istringstream&  is,
                       const char *    msg)
 {
@@ -373,6 +401,41 @@ void VirtualMachineManagerDriver::protocol(
             lcm->trigger(LifeCycleManager::DETACH_FAILURE, id);
         }
     }
+    else if ( action == "SCALE_MEMORY" )
+    {
+        Nebula              &ne  = Nebula::instance();
+        LifeCycleManager    *lcm = ne.get_lcm();
+
+        if (result == "SUCCESS")
+        {
+            lcm->trigger(LifeCycleManager::SCALE_MEMORY_SUCCESS, id);
+        }
+        else
+        {
+            // TODO do what is said
+            log_error(vm,os,is,"Error scaling VM's memory, assuming the biggest amount of memory could be using is still used by the VM");
+            vmpool->update(vm);
+
+            lcm->trigger(LifeCycleManager::SCALE_MEMORY_FAILURE, id);
+        }
+    }
+    else if ( action == "SCALE_VCPU" )
+    {
+        Nebula              &ne  = Nebula::instance();
+        LifeCycleManager    *lcm = ne.get_lcm();
+
+        if (result == "SUCCESS")
+        {
+            lcm->trigger(LifeCycleManager::SCALE_VCPU_SUCCESS, id);
+        }
+        else
+        {
+            log_error(vm,os,is,"Error scaling VM's number of VCPUs");
+            vmpool->update(vm);
+
+            lcm->trigger(LifeCycleManager::SCALE_VCPU_FAILURE, id);
+        }
+    }
     else if ( action == "POLL" )
     {
         if (result == "SUCCESS")
@@ -468,7 +531,8 @@ void VirtualMachineManagerDriver::protocol(
                 return;
             }
 
-            vm->update_info(memory,cpu,net_tx,net_rx);
+            // FIXME Set the right number of VCPUs by extending the pooled informations
+            vm->update_info(memory,cpu,0,net_tx,net_rx);
             vm->set_vm_info();
 
             vmpool->update(vm);

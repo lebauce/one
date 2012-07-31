@@ -996,3 +996,93 @@ int DispatchManager::detach(
 
     return 0;
 }
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+int DispatchManager::memset (
+    VirtualMachine *    vm)
+{
+    ostringstream oss;
+    int           vid;
+
+    if ( vm == 0 )
+    {
+        return -1;
+    }
+
+    vid = vm->get_oid();
+
+    oss << "Scaling memory of VM " << vid;
+    NebulaLog::log("DiM",Log::DEBUG,oss);
+
+    if ( vm->get_state() == VirtualMachine::RUNNING )
+    {
+        Nebula&             nd  = Nebula::instance();
+        LifeCycleManager *  lcm = nd.get_lcm();
+
+        lcm->trigger(LifeCycleManager::SCALE_MEMORY,vid);
+    }
+    else
+    {
+        goto error;
+    }
+
+    vm->unlock();
+
+    return 0;
+
+error:
+
+    oss.str("");
+    oss << "Could not scale the memory of VM " << vid << ", wrong state.";
+    NebulaLog::log("DiM",Log::ERROR,oss);
+
+    vm->unlock();
+    return -1;
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+int DispatchManager::vcpuset (
+    VirtualMachine *    vm)
+{
+    ostringstream oss;
+    int           vid;
+
+    if ( vm == 0 )
+    {
+        return -1;
+    }
+
+    vid = vm->get_oid();
+
+    oss << "Scaling the number of VCPUs of VM " << vid;
+    NebulaLog::log("DiM",Log::DEBUG,oss);
+
+    if ( vm->get_state() == VirtualMachine::RUNNING )
+    {
+        Nebula&             nd  = Nebula::instance();
+        LifeCycleManager *  lcm = nd.get_lcm();
+
+        lcm->trigger(LifeCycleManager::SCALE_VCPU,vid);
+    }
+    else
+    {
+        goto error;
+    }
+
+    vm->unlock();
+
+    return 0;
+
+error:
+
+    oss.str("");
+    oss << "Could not scale the number of VCPUs of VM " << vid << ", wrong state.";
+    NebulaLog::log("DiM",Log::ERROR,oss);
+
+    vm->unlock();
+    return -1;
+}

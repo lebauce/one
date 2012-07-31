@@ -84,6 +84,14 @@ class DummyDriver < VirtualMachineDriver
         send_message(ACTION[:detach_disk],RESULT[:success],id)
     end
 
+    def scale_memory(id, drv_message)
+        send_message(ACTION[:scale_memory],RESULT[:success],id)
+    end
+
+    def scale_vcpu(id, drv_message)
+        send_message(ACTION[:scale_vcpu],RESULT[:success],id)
+    end
+
     def poll(id, drv_message)
 
         msg = decode(drv_message)

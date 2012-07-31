@@ -52,6 +52,8 @@ public:
         MIGRATE,
         RESTORE,
         REBOOT,
+        SCALE_MEMORY,
+        SCALE_VCPU,
         RESET,
         POLL,
         TIMER,
@@ -212,6 +214,8 @@ private:
         const string& m_hostname,
         const string& m_net_drv,
         const string& domain,
+        const string& memory,
+        const string& vcpu,
         const string& ldfile,
         const string& rdfile,
         const string& cfile,
@@ -283,6 +287,20 @@ private:
      *    @param vid the id of the VM.
      */
     void reset_action(
+        int vid);
+
+    /**
+     *  Scale the memory of a running VM.
+     *    @param vid the id of the VM.   
+     */
+     void scale_memory_action(
+        int vid);
+
+     /**
+      *  Scale the number of vcpu of a running VM.
+      *    @param vid the id of the VM.
+      */
+     void scale_vcpu_action(
         int vid);
 
     /**

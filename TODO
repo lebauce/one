@@ -1,0 +1,12 @@
+About the scale-in features:
+
+-(Implement KVM's scaling methods)
+-If we want VCPU hotpluging to be more useful, we must also take care of scaling the CPU share on the hypervisor
+-Check/Separate variable used to monitor used memory and variable used to set new memory amount
+
+-Check the aftermath of adding new states to the LCM
+-Register VM changes to either the VM history or to new VM attributes
+-Find a better way to inform the user in case of scale-in failure
+-Extend polling/monitoring to get number of VCPUs
+-When a scaling attempt fails, force a poll request
+-Write tests

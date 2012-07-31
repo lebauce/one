@@ -712,6 +712,8 @@ VMM_EXEC_XEN_SCRIPTS="src/vmm_mad/remotes/xen/cancel \
                     src/vmm_mad/remotes/xen/deploy \
                     src/vmm_mad/remotes/xen/xenrc \
                     src/vmm_mad/remotes/xen/migrate \
+                    src/vmm_mad/remotes/xen/scale_vcpu \
+                    src/vmm_mad/remotes/xen/scale_memory \
                     src/vmm_mad/remotes/xen/restore \
                     src/vmm_mad/remotes/xen/reboot \
                     src/vmm_mad/remotes/xen/reset \

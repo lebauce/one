@@ -172,6 +172,7 @@ public:
     void update_info(
         const int _memory,
         const int _cpu,
+        const int _vcpu,
         const int _net_tx,
         const int _net_rx)
     {
@@ -183,6 +184,11 @@ public:
         if (_cpu != -1)
         {
             cpu    = _cpu;
+        }
+
+        if (_vcpu != -1)
+        {
+            vcpu    = _vcpu;
         }
 
         if (_net_tx != -1)
@@ -613,7 +619,7 @@ public:
      *    @return 0 on success.
      */
     int  parse_template_attribute(const string& attribute, string& parsed);
-    
+
     /**
      *  Factory method for virtual machine templates
      */
@@ -717,6 +723,28 @@ public:
      */
     void get_requirements (int& cpu, int& memory, int& disk);
 
+     /**
+     *  Get the VM's amount of memory.
+     *    @return the amount of memory in MB
+     */
+    const string get_memory()
+    {
+        ostringstream oss;
+        oss << memory;
+        return oss.str();
+    }
+
+     /**
+     *  Get the VM's number of VCPUs.
+     *    @return the number of VCPUs
+     */
+    const string get_vcpu()
+    {
+        ostringstream oss;
+        oss << vcpu;
+        return oss.str();
+    }
+
     // ------------------------------------------------------------------------
     // Network Leases & Disk Images
     // ------------------------------------------------------------------------
@@ -787,8 +815,8 @@ public:
      *    @param  ar the AuthRequest object
      *    @param  tmpl the virtual machine template
      */
-    static void set_auth_request(int uid, 
-                                 AuthRequest& ar, 
+    static void set_auth_request(int uid,
+                                 AuthRequest& ar,
                                  VirtualMachineTemplate *tmpl);
 
     // ------------------------------------------------------------------------
@@ -934,6 +962,11 @@ private:
      *  CPU usage (percent)
      */
     int         cpu;
+
+    /**
+      *  VCPU number
+      */
+    int         vcpu;
 
     /**
      *  Network usage, transmitted bytes
@@ -1109,9 +1142,9 @@ protected:
     // Constructor
     //**************************************************************************
 
-    VirtualMachine(int id, 
+    VirtualMachine(int id,
                    int uid,
-                   int gid, 
+                   int gid,
                    const string& uname,
                    const string& gname,
                    VirtualMachineTemplate * _vm_template);

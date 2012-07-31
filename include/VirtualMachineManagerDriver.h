@@ -30,7 +30,7 @@ using namespace std;
  *  VirtualMachineManagerDriver provides a base class to implement VM Manager
  *  Drivers. This class implements the protocol and recover functions
  *  from the Mad interface. Classes derived from the VirtualMachineManagerDriver
- *  must implement the deployment function to generate specific VM  
+ *  must implement the deployment function to generate specific VM
  *  deployment information for the unerlying MAD.
  */
 class VirtualMachineManagerDriver : public Mad
@@ -53,7 +53,7 @@ public:
         string&     message);
 
     /**
-     *  TODO: What do we need here? just poll the active VMs to recover 
+     *  TODO: What do we need here? just poll the active VMs to recover
      *  connections? Or an specific recover action from the MAD?
      */
     void recover();
@@ -67,25 +67,25 @@ public:
     virtual int deployment_description(
         const VirtualMachine *  vm,
         const string&           file_name) const = 0;
-    
-protected:	
+
+protected:
     /**
-     *  Gets a configuration attr from driver configuration file (single 
+     *  Gets a configuration attr from driver configuration file (single
      *  version)
      *    @param name of config attribute
      *    @param value of the attribute
      */
     void get_default(
-    	const char *  name, 
+      const char *  name,
         string&       value) const
     {
-    	string sn = name;
-    	
-    	driver_conf.get(sn,value);
-    }    
+      string sn = name;
+
+      driver_conf.get(sn,value);
+    }
 
     /**
-     *  Gets a configuration attr from driver configuration file (vector 
+     *  Gets a configuration attr from driver configuration file (vector
      *  version)
      *    @param name of config vector attribute for the domain
      *    @param vname of the attribute
@@ -95,20 +95,20 @@ protected:
     	const char *  name,
     	const char *  vname,
         string&       value) const;
-    
-private:	
-	/**	
+
+private:
+	/**
 	 *  Configuration file for the driver
 	 */
 	Template	driver_conf;
-	
+
     /**
      *  Pointer to the Virtual Machine Pool, to access VMs
      */
     VirtualMachinePool * vmpool;
 
     friend class VirtualMachineManager;
-      
+
     /**
      *  Sends a deploy request to the MAD: "DEPLOY ID XML_DRV_MSG"
      *    @param oid the virtual machine id.
@@ -218,6 +218,24 @@ private:
     {
         write_drv("MIGRATE", oid, drv_msg);
     }
+
+    /**
+     *  Sends a scale memory request to the MAD: "SCALE_MEMORY ID MEMORY"
+     *    @param oid the virtual machine id.
+     *    @param drv_msg xml data for the mad operation
+     */
+    void scale_memory (
+        const int     oid,
+        const string& drv_msg) const;
+
+    /**
+     *  Sends a scale vcpu request to the MAD: "SCALE_VCPU ID VCPU"
+     *    @param oid the virtual machine id.
+     *    @param drv_msg xml data for the mad operation
+     */
+    void scale_vcpu (
+        const int     oid,
+        const string& drv_msg) const;
 
     /**
      *  Sends a poll request to the MAD: "POLL ID XML_DRV_MSG"

@@ -89,6 +89,14 @@ cmd=CommandParser::CmdParser.new(ARGV) do
         format_int(arg)
     end
 
+    set :format, :memory, OneVMHelper.memory_to_i_desc do |arg|
+        helper.memory_to_i(arg)
+    end
+
+    set :format, :vcpu, OneVMHelper.vcpu_to_i_desc do |arg|
+        helper.vcpu_to_i(arg)
+    end
+
     ########################################################################
     # Commands
     ########################################################################
@@ -476,5 +484,29 @@ cmd=CommandParser::CmdParser.new(ARGV) do
     command :top, top_desc, [:filterflag, nil],
             :options=>CLIHelper::OPTIONS+OpenNebulaHelper::OPTIONS do
         helper.list_pool(options, true, args[0])
+    end
+
+    memset_desc = <<-EOT.unindent
+        Change the amount of memory of the given VM online
+
+        States: RUNNING
+    EOT
+
+    command :memset, memset_desc, [:range,:vmid_list], :memory do
+        helper.perform_actions(args[0],options,"Hot resizing memory") do |vm|
+            vm.memset(args[1])
+        end
+    end
+
+    vcpuset_desc = <<-EOT.unindent
+        Change the number of VCPUs of the given VM online
+
+        States: RUNNING
+    EOT
+
+    command :vcpuset, vcpuset_desc, [:range,:vmid_list], :vcpu do
+        helper.perform_actions(args[0],options,"Hotpluging/Hotunplugin VCPUs") do |vm|
+            vm.vcpuset(args[1])
+        end
     end
 end

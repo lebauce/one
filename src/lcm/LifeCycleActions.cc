@@ -562,6 +562,72 @@ void  LifeCycleManager::clean_action(int vid)
 
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
+void  LifeCycleManager::scale_memory_action(int vid)
+{
+    VirtualMachine * vm;
+
+    vm = vmpool->get(vid,true);
+
+    if ( vm == 0 )
+    {
+        return;
+    }
+
+    if (vm->get_state() == VirtualMachine::ACTIVE &&
+        vm->get_lcm_state() == VirtualMachine::RUNNING)
+    {
+        Nebula&           nd = Nebula::instance();
+        VirtualMachineManager * vmm = nd.get_vmm();
+
+        vm->log("LCM",Log::INFO,"Attempting to scale VM's memory");
+
+        vmm->trigger(VirtualMachineManager::SCALE_MEMORY,vid);
+    }
+    else
+    {
+        vm->log("LCM", Log::ERROR, "scale_memory_action, VM in a wrong state.");
+    }
+
+    vm->unlock();
+
+    return;
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+void  LifeCycleManager::scale_vcpu_action(int vid)
+{
+    VirtualMachine * vm;
+
+    vm = vmpool->get(vid,true);
+
+    if ( vm == 0 )
+    {
+        return;
+    }
+
+    if (vm->get_state() == VirtualMachine::ACTIVE &&
+        vm->get_lcm_state() == VirtualMachine::RUNNING)
+    {
+        Nebula&           nd = Nebula::instance();
+        VirtualMachineManager * vmm = nd.get_vmm();
+
+        vm->log("LCM",Log::INFO,"Attempting to scale VM's number of VCPUs");
+
+        vmm->trigger(VirtualMachineManager::SCALE_VCPU,vid);
+    }
+    else
+    {
+        vm->log("LCM", Log::ERROR, "scale_vcpu_action, VM in a wrong state.");
+    }
+
+    vm->unlock();
+
+    return;
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
 void  LifeCycleManager::clean_up_vm(VirtualMachine * vm)
 {
@@ -684,7 +750,7 @@ void  LifeCycleManager::clean_up_vm(VirtualMachine * vm)
             vmpool->update_history(vm);
             tm->trigger(TransferManager::EPILOG_DELETE,vid);
         break;
-        
+
         default: //LCM_INIT,CLEANUP
         break;
     }

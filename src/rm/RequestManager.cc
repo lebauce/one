@@ -248,6 +248,8 @@ void RequestManager::register_xml_methods()
     xmlrpc_c::methodPtr vm_migrate(new VirtualMachineMigrate());
     xmlrpc_c::methodPtr vm_action(new VirtualMachineAction()); 
     xmlrpc_c::methodPtr vm_savedisk(new VirtualMachineSaveDisk());
+    xmlrpc_c::methodPtr vm_memset(new VirtualMachineMemSet());
+    xmlrpc_c::methodPtr vm_vcpuset(new VirtualMachineVcpuSet());
     xmlrpc_c::methodPtr vm_monitoring(new VirtualMachineMonitoring());
     xmlrpc_c::methodPtr vm_attach(new VirtualMachineAttach());
     xmlrpc_c::methodPtr vm_detach(new VirtualMachineDetach());
@@ -374,6 +376,8 @@ void RequestManager::register_xml_methods()
     RequestManagerRegistry.addMethod("one.vm.monitoring", vm_monitoring);
     RequestManagerRegistry.addMethod("one.vm.attach", vm_attach);
     RequestManagerRegistry.addMethod("one.vm.detach", vm_detach);
+    RequestManagerRegistry.addMethod("one.vm.memset", vm_memset);
+    RequestManagerRegistry.addMethod("one.vm.vcpuset", vm_vcpuset);
 
     RequestManagerRegistry.addMethod("one.vmpool.info", vm_pool_info);
     RequestManagerRegistry.addMethod("one.vmpool.accounting", vm_pool_acct);

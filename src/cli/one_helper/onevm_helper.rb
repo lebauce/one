@@ -140,6 +140,30 @@ class OneVMHelper < OpenNebulaHelper::OneHelper
         end
 
         table
+		end
+
+    def memory_to_i(memory)
+        if memory.match(/^[0123456789]+$/)
+            return 0,memory.to_i
+        else
+            return -1,"amount memory must be a positive number"
+        end
+    end
+
+    def vcpu_to_i(vcpu)
+        if vcpu.match(/^[0123456789]+$/)
+            return 0,vcpu.to_i
+        else
+            return -1,"number of vcpus must be a positive number"
+        end
+    end
+
+    def self.memory_to_i_desc
+        "OpenNebula VM amount of memory"
+    end
+
+    def self.vcpu_to_i_desc
+        "OpenNebula VM number of VPUs"
     end
 
     private

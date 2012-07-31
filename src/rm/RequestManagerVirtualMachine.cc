@@ -17,6 +17,7 @@
 #include "RequestManagerVirtualMachine.h"
 #include "PoolObjectAuth.h"
 #include "Nebula.h"
+#include "ostream"
 
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
@@ -95,8 +96,8 @@ bool RequestManagerVirtualMachine::vm_authorization(
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-int RequestManagerVirtualMachine::get_host_information(int hid, 
-                                                string& name, 
+int RequestManagerVirtualMachine::get_host_information(int hid,
+                                                string& name,
                                                 string& vmm,
                                                 string& vnm,
                                                 string& tm,
@@ -873,6 +874,106 @@ void VirtualMachineDetach::request_execute(xmlrpc_c::paramList const& paramList,
     }
 
     return;    
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void VirtualMachineMemSet::request_execute(xmlrpc_c::paramList const& paramList,
+                                             RequestAttributes& att)
+{
+    Nebula&     nd    = Nebula::instance();
+    DispatchManager *   dm = nd.get_dm();
+
+    int    id      = xmlrpc_c::value_int(paramList.getInt(1));
+    int    memory  = xmlrpc_c::value_int(paramList.getInt(2));
+
+    VirtualMachine * vm;
+    string           vm_owner;
+
+    int           rc;
+    string        error_str;
+    char *        error_char;
+
+    if ( vm_authorization(id, 0, 0, att, 0, 0, auth_op) == false )
+    {
+        return;
+    }
+
+    if ( (vm = get_vm(id, att)) == 0 )
+    {
+        return;
+    }
+
+    if ( vm->get_state() != VirtualMachine::RUNNING )
+    {
+        failure_response(ACTION,
+                request_error("Wrong state to perform action",""),
+                att);
+
+        vm->unlock();
+        return;
+    }
+
+    // TODO Log action in VM History or in other VM attributes
+
+    vm->update_info(memory,-1,-1,-1,-1);
+
+    dm->memset(vm);
+
+    vm->unlock();
+
+    success_response(id, att);
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void VirtualMachineVcpuSet::request_execute(xmlrpc_c::paramList const& paramList,
+                                             RequestAttributes& att)
+{
+    Nebula&     nd    = Nebula::instance();
+    DispatchManager *   dm = nd.get_dm();
+
+    int    id      = xmlrpc_c::value_int(paramList.getInt(1));
+    int    vcpu  = xmlrpc_c::value_int(paramList.getInt(2));
+
+    VirtualMachine * vm;
+    string           vm_owner;
+
+    int           rc;
+    string        error_str;
+    char *        error_char;
+
+    if ( vm_authorization(id, 0, 0, att, 0, 0, auth_op) == false )
+    {
+        return;
+    }
+
+    if ( (vm = get_vm(id, att)) == 0 )
+    {
+        return;
+    }
+
+    if ( vm->get_state() != VirtualMachine::RUNNING )
+    {
+        failure_response(ACTION,
+                request_error("Wrong state to perform action",""),
+                att);
+
+        vm->unlock();
+        return;
+    }
+
+    // TODO Log action in VM History or in other VM attributes
+
+    vm->update_info(-1,-1,vcpu,-1,-1);
+
+    dm->vcpuset(vm);
+
+    vm->unlock();
+
+    success_response(id, att);
 }
 
 /* -------------------------------------------------------------------------- */

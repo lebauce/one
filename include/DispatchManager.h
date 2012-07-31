@@ -266,6 +266,26 @@ public:
         int      disk_id,
         string&  error_str);
 
+     /**
+     *  Change the amount of memory of the VM online.
+     *  The VM MUST have its mutex locked. If the function fails
+     *  the calling funtion is responsible for recovering from the error.
+     *    @param vm pointer to a VirtualMachine with its mutex locked.
+     *    @return 0 on success
+     */
+    int memset(
+        VirtualMachine * vm);
+
+     /**
+     *  Change the number of VCPUs of the VM online.
+     *  The VM MUST have its mutex locked. If the function fails
+     *  the calling funtion is responsible for recovering from the error.
+     *    @param vm pointer to a VirtualMachine with its mutex locked.
+     *    @return 0 on success
+     */
+    int vcpuset(
+        VirtualMachine * vm);
+
 private:
     /**
      *  Thread id for the Dispatch Manager

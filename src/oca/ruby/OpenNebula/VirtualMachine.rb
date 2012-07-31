@@ -33,12 +33,14 @@ module OpenNebula
             :savedisk   => "vm.savedisk",
             :chown      => "vm.chown",
             :chmod      => "vm.chmod",
+            :memset     => "vm.memset",
+            :vcpuset    => "vm.vcpuset",
             :monitoring => "vm.monitoring",
             :attach     => "vm.attach",
             :detach     => "vm.detach"
         }
 
-        VM_STATE=%w{INIT PENDING HOLD ACTIVE STOPPED SUSPENDED DONE FAILED}
+        VM_STATE=%w{INIT PENDING HOLD ACTIVE STOPPED SUSPENDED DONE FAILED MUTATING}
 
         LCM_STATE=%w{LCM_INIT PROLOG BOOT RUNNING MIGRATE SAVE_STOP SAVE_SUSPEND
             SAVE_MIGRATE PROLOG_MIGRATE PROLOG_RESUME EPILOG_STOP EPILOG
@@ -52,7 +54,8 @@ module OpenNebula
             "STOPPED"   => "stop",
             "SUSPENDED" => "susp",
             "DONE"      => "done",
-            "FAILED"    => "fail"
+            "FAILED"    => "fail",
+            "MUTATING"  => "muta"
         }
 
         SHORT_LCM_STATES={
@@ -337,6 +340,26 @@ module OpenNebula
             return Error.new('ID not defined') if !@pe_id
 
             return @client.call(VM_METHODS[:monitoring], @pe_id)
+        end
+
+        # Change the amount of memory of the given VM online
+        def memset(memory)
+            return Error.new('ID not defined') if !@pe_id
+
+            rc = @client.call(VM_METHODS[:memset], @pe_id, memory.to_i)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
+        end
+
+        # Change the number of VPUs of the given VM online
+        def vcpuset(vcpu)
+            return Error.new('ID not defined') if !@pe_id
+
+            rc = @client.call(VM_METHODS[:vcpuset], @pe_id, vcpu.to_i)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
         end
 
         #######################################################################

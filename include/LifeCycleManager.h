@@ -53,7 +53,11 @@ public:
         CANCEL_FAILURE,   /**< Sent by the VMM when a cancel action fails     */
         MONITOR_FAILURE,  /**< Sent by the VMM when a VM has failed while active */
         MONITOR_SUSPEND,  /**< Sent by the VMM when a VM is paused while active */
-        MONITOR_DONE,     /**< Sent by the VMM when a VM is not found */
+        MONITOR_DONE,     /**< Sent by the VMM when a VM is not found         */
+        SCALE_MEMORY_SUCCESS,/**< Sent by the VMM when a memory scaling action succeeds*/
+        SCALE_MEMORY_FAILURE,/**< Sent by the VMM when a memory scaling action fails*/
+        SCALE_VCPU_SUCCESS,/**< Sent by the VMM when a vcpu scaling action succeeds*/
+        SCALE_VCPU_FAILURE,/**< Sent by the VMM when a vcpu scaling action fails*/
         PROLOG_SUCCESS,   /**< Sent by the TM when the prolog phase succeeds  */
         PROLOG_FAILURE,   /**< Sent by the TM when the prolog phase fails     */
         EPILOG_SUCCESS,   /**< Sent by the TM when the epilog phase succeeds  */
@@ -73,6 +77,8 @@ public:
         RESTART,          /**< Sent by the DM to restart a deployed VM        */
         DELETE,           /**< Sent by the DM to delete a VM                  */
         CLEAN,            /**< Sent by the DM to cleanup a VM for resubmission*/
+        SCALE_MEMORY,     /**< Sent by the DM to change VM memory size        */
+        SCALE_VCPU,       /**< Sent by the DM to change VM number of VCPUs    */
         FINALIZE
     };
 
@@ -168,6 +174,14 @@ private:
 
     void monitor_done_action(int vid);
 
+    void scale_memory_success_action(int vid);
+
+    void scale_memory_failure_action(int vid);
+
+    void scale_vcpu_success_action(int vid);
+
+    void scale_vcpu_failure_action(int vid);
+
     void prolog_success_action(int vid);
 
     void prolog_failure_action(int vid);
@@ -209,6 +223,10 @@ private:
     void delete_action(int vid);
 
     void clean_action(int vid);
+
+    void scale_memory_action(int vid);
+
+    void scale_vcpu_action(int vid);
 
     void timer_action();
 };

@@ -75,6 +75,10 @@ class VmmAction
         get_data(:disk_target_path)
         get_data(:tm_command)
 
+        # For scale in
+        get_data(:memory)
+        get_data(:vcpu)
+
         # Initialize streams and vnm
         @ssh_src = @vmm.get_ssh_stream(action, @data[:host], @id)
         @vnm_src = VirtualNetworkDriver.new(@data[:net_drv],
@@ -465,6 +469,42 @@ class ExecDriver < VirtualMachineDriver
                 :parameters   => [:deploy_id],
                 :destination  => :true
                 #TODO :fail_action what to do here? cancel VM?
+            },
+        ]
+
+        action.run(steps)
+    end
+
+    #
+    # SCALE_MEMORY (live) action, change the amount of memory of the VM
+    #
+    def scale_memory(id, drv_message)
+        action=VmmAction.new(self, id, :scale_memory, drv_message)
+
+        steps=[
+            # Scale the memory of the Virtual Machine
+            {
+                :driver     => :vmm,
+                :action     => :scale_memory,
+                :parameters => [:deploy_id, :memory]
+            },
+        ]
+
+        action.run(steps)
+    end
+
+    #
+    # SCALE_VCPU (live) action, change the number of VCPUs of the VM
+    #
+    def scale_vcpu(id, drv_message)
+        action=VmmAction.new(self, id, :scale_vcpu, drv_message)
+
+        steps=[
+            # Scale number of vcpu of the Virtual Machine
+            {
+                :driver     => :vmm,
+                :action     => :scale_vcpu,
+                :parameters => [:deploy_id, :vcpu]
             },
         ]
 

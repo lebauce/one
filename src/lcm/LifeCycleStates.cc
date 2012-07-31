@@ -793,6 +793,129 @@ void  LifeCycleManager::monitor_done_action(int vid)
     vm->unlock();
 }
 
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void  LifeCycleManager::scale_memory_success_action(int vid)
+{
+    Nebula&             nd = Nebula::instance();
+    VirtualMachine *    vm;
+
+    vm = vmpool->get(vid,true);
+
+    if ( vm == 0 )
+    {
+        return;
+    }
+
+    vm->log("LCM", Log::INFO, "Attempt to scale VM memory succeed");
+
+    vm->unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void  LifeCycleManager::scale_memory_failure_action(int vid)
+{
+    Nebula&             nd = Nebula::instance();
+    VirtualMachine *    vm;
+
+    vm = vmpool->get(vid,true);
+
+    if ( vm == 0 )
+    {
+        return;
+    }
+
+    /**
+     * In case of failure, we can't do much...
+     * - In case the VM's still running, we don't want to mark it
+     *   as failed and/or unsable.
+     * - If the amount of memory effectively changed but not enought
+     *   to reach the target, we want to take into account the biggest
+     *   possible amount of memory the VM is using to not mess with
+     *   the scheduler.
+     *
+     * I'm not aware of a better way to inform the user of the failure
+     * than using the logging mechanism.
+     *
+     * FIXME Better inform the user of the failure
+     */
+
+    // FIXME In case of scaling down, save the previous amount of memory
+
+    vm->log("LCM", Log::ERROR, "Attempt to scale VM memory failed");
+
+    vm->unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void  LifeCycleManager::scale_vcpu_success_action(int vid)
+{
+    Nebula&             nd = Nebula::instance();
+    VirtualMachine *    vm;
+
+    vm = vmpool->get(vid,true);
+
+    if ( vm == 0 )
+    {
+        return;
+    }
+
+    vm->log("LCM", Log::INFO, "Attempt to scale VM number of VCPUs succeed");
+
+    vm->unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+void  LifeCycleManager::scale_vcpu_failure_action(int vid)
+{
+    Nebula&             nd = Nebula::instance();
+    VirtualMachine *    vm;
+
+    int memory = -1;
+    int cpu    = -1;
+    int net_tx = -1;
+    int net_rx = -1;
+
+    vm = vmpool->get(vid,true);
+
+    if ( vm == 0 )
+    {
+        return;
+    }
+
+     /**
+     * In case of failure, we can't do much...
+     * - In case the VM's still running, we don't want to mark it
+     *   as failed and/or unsable.
+     * - We don't know how many VCPUs the VM has access to. As the
+     *   number of VCPUs doesn't have an impact on VM scheduling (AFAIK)
+     *   we set it to 0 so that the user might see that something went
+     *   wrong.
+     *
+     * I'm not aware of a better way to inform the user of the failure
+     * than using the logging mechanism.
+     *
+     * FIXME Better inform the user of the failure
+     */
+
+    vm->get_template_attribute("MEMORY",memory);
+    vm->get_template_attribute("CPU",cpu);
+    vm->get_template_attribute("NET_TX",net_tx);
+    vm->get_template_attribute("NET_RX",net_rx);
+
+    vm->update_info(memory,cpu,0,net_tx,net_rx);
+
+    vm->log("LCM", Log::ERROR, "Attempt to scale VM number of VCPUs failed");
+
+    vm->unlock();
+}
 
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
