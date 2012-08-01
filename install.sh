@@ -694,6 +694,8 @@ VMM_EXEC_KVM_SCRIPTS="src/vmm_mad/remotes/kvm/cancel \
                     src/vmm_mad/remotes/kvm/kvmrc \
                     src/vmm_mad/remotes/kvm/migrate \
                     src/vmm_mad/remotes/kvm/migrate_local \
+                    src/vmm_mad/remotes/kvm/scale_vcpu \
+                    src/vmm_mad/remotes/kvm/scale_memory \
                     src/vmm_mad/remotes/kvm/restore \
                     src/vmm_mad/remotes/kvm/reboot \
                     src/vmm_mad/remotes/kvm/reset \

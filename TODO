@@ -1,6 +1,5 @@
 About the scale-in features:
 
--(Implement KVM's scaling methods)
 -If we want VCPU hotpluging to be more useful, we must also take care of scaling the CPU share on the hypervisor
 -Check/Separate variable used to monitor used memory and variable used to set new memory amount
 
